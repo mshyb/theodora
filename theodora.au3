@@ -6,8 +6,8 @@
 
 Global $LIBRE_LOCATION_EXE = _libre_getloc()
 
-
-;GetText('C:\Users\Alex\OneDrive\Documents\WeddingGifts.xlsx')
+;Theodora.exe doc.docx -tw template -o stdout
+;GetText()
 
 Func GetText($sfile)
 	Local $text = TikaStreamtext($sfile)
@@ -22,7 +22,7 @@ Func _libre_getloc()
 	EndIf
 EndFunc   ;==>_libre_getloc
 
-Func _Libre_string($sInFile)
+Func _Libre_string($sInFile, $debug = False)
 	;https://help.libreoffice.org/Common/Starting_the_Software_With_Parameters
 	Local $f1, $f2, $f3, $f4
 	Local $timeout = TimerInit(), $sOutput = ''
@@ -34,7 +34,7 @@ Func _Libre_string($sInFile)
 			' --convert-to txt' & _
 			' --outdir "' & @TempDir & '"' & _ ; remove trailing backslash
 			' "' & $sInFile & '"'
-	;ConsoleWrite($str_cmd & @CRLF)
+	If $debug = True then ConsoleWrite($str_cmd & @CRLF)
 	Local $iPID = Run($str_cmd, '', @SW_HIDE, BitOR(4, 2))
 	While 1
 		$sOutput &= StderrRead($iPID)
@@ -48,7 +48,7 @@ Func _Libre_string($sInFile)
 		EndSelect
 		Sleep(10)
 	WEnd
-	;ConsoleWrite($sOutput & @CRLF)
+	If $debug = True then ConsoleWrite($sOutput & @CRLF)
 	If FileExists($tmpfile) Then
 		Local $hndtxt = FileOpen($tmpfile)
 		Local $txt = FileRead($hndtxt)
@@ -57,11 +57,9 @@ Func _Libre_string($sInFile)
 		Return $txt
 	EndIf
 	Return -1
-
 EndFunc   ;==>_Libre_string
 
 Func _textWalkEx($sText, $aTemplate); need multiple templates
-	;ConsoleWrite($sText & @CRLF)
 	Local $int_err = 0
 	Local $boo_err = 0
 	Local $aOut[UBound($aTemplate) - 1]
