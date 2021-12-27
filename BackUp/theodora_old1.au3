@@ -4,23 +4,20 @@
 #include "..\UDF\mshytools\basics.au3"
 #include "..\UDF\Registry\RegEnumKeyValEx.au3"
 
-Global $LIBRE_LOCATION_EXE = _libre_getloc()
-
-
-;GetText('C:\Users\Alex\OneDrive\Documents\WeddingGifts.xlsx')
+Global 	$LIBRE_LOCATION_EXE = _libre_getloc()
 
 Func GetText($sfile)
-	Local $text = TikaStreamtext($sfile)
-	If @extended = 422 Then $text = _Libre_string($sfile)
+Local $text = TikaStreamtext($sfile)
+	if @extended = 422 then $text = _Libre_string($sfile)
 	ConsoleWrite($text & @CRLF)
-EndFunc   ;==>GetText
+EndFunc
 
 Func _libre_getloc()
 	Local $reg_libre_loc = _RegEnumKeyEx('HKEY_LOCAL_MACHINE\SOFTWARE\LibreOffice\LibreOffice')
-	If IsArray($reg_libre_loc) Then
-		Return RegRead($reg_libre_loc[1], 'Path')
-	EndIf
-EndFunc   ;==>_libre_getloc
+	if IsArray($reg_libre_loc) Then
+		return RegRead($reg_libre_loc[1], 'Path')
+	endif
+EndFunc
 
 Func _Libre_string($sInFile)
 	;https://help.libreoffice.org/Common/Starting_the_Software_With_Parameters
@@ -58,39 +55,4 @@ Func _Libre_string($sInFile)
 	EndIf
 	Return -1
 
-EndFunc   ;==>_Libre_string
-
-Func _textWalkEx($sText, $aTemplate); need multiple templates
-	;ConsoleWrite($sText & @CRLF)
-	Local $int_err = 0
-	Local $boo_err = 0
-	Local $aOut[UBound($aTemplate) - 1]
-	For $i = 0 To UBound($aTemplate) - 1
-		Local $len = StringLen($aTemplate[$i][0])
-		Local $find = StringInStr($sText, $aTemplate[$i][0], 1)
-		If $find Then
-			Switch $i
-				Case (UBound($aTemplate) - 1) ;											last
-					;
-				Case Else
-					Local $find_nex = StringInStr($sText, $aTemplate[$i + 1][0], 1)
-					Local $cut = StringMid($sText, _
-							$find + $len, _
-							($find_nex - $find) - $len)
-					$cut = StringReplace($cut, @LF, ' ')
-					$cut = StringReplace($cut, @CR, ' ')
-					$cut = StringStripWS($cut, $STR_STRIPLEADING + $STR_STRIPTRAILING)
-					If StringLen($cut) < $aTemplate[$i][1] Then
-						$aOut[$i] = $cut
-					Else
-						$boo_err = 1
-						$int_err += 1
-					EndIf
-			EndSwitch
-		Else
-			$boo_err = 1
-			$int_err += 1
-		EndIf
-	Next
-	Return SetError($boo_err, $int_err, $aOut)
-EndFunc   ;==>_textWalkEx
+EndFunc   ;==>_LIBRE_TO_MEM
